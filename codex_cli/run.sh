@@ -16,7 +16,7 @@ if [ ! -e "$SSH_DIR/ssh_host_ed25519_key" ]; then
 fi
 
 cp "$KEY_FILE" "$HOME_DIR/.ssh/authorized_keys"
-chown -R codex:codex "$HOME_DIR"
+chown -R codex:root "$HOME_DIR"
 chmod 0700 "$HOME_DIR" "$HOME_DIR/.ssh" "$HOME_DIR/.codex"
 chmod 0600 "$HOME_DIR/.ssh/authorized_keys" "$SSH_DIR/ssh_host_ed25519_key"
 chmod 0644 "$SSH_DIR/ssh_host_ed25519_key.pub"

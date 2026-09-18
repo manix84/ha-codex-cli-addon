@@ -11,7 +11,7 @@ This add-on provides a dedicated SSH login named `codex`. The Codex executable i
 5. Sign in from a terminal with `ssh -t -p 22223 codex@<home-assistant-address> 'codex login --device-auth'`, then check `codex login status` over SSH.
 6. Configure the Codex desktop SSH connection for `codex@<home-assistant-address>` on the chosen port. Test that the desktop app opens a task in `/homeassistant` or `/addons`.
 
-The add-on maps the Home Assistant configuration folder at `/homeassistant` and local add-on source at `/addons`, both writable. Only install this on a trusted Home Assistant system, and restrict network access to the SSH port. The add-on does not expose a web interface or request Supervisor API access.
+The add-on maps the Home Assistant configuration folder at `/homeassistant` and local add-on source at `/addons`, both writable. The `codex` SSH account has root permissions inside this container so it can edit those root-owned mounts. It can read Home Assistant secrets in `/homeassistant`. Give its SSH key only to trusted administrators and keep the SSH port on a trusted network. The add-on does not expose a web interface or request Supervisor API access.
 
 ## Updates and backup
 

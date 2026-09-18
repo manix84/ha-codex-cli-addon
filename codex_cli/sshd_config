@@ -1,8 +1,9 @@
 Port 22
 ListenAddress 0.0.0.0
 HostKey /data/ssh/ssh_host_ed25519_key
-PermitRootLogin no
+PermitRootLogin prohibit-password
 PasswordAuthentication no
+PermitEmptyPasswords no
 KbdInteractiveAuthentication no
 PubkeyAuthentication yes
 AuthorizedKeysFile .ssh/authorized_keys

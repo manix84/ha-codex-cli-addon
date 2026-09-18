@@ -1,0 +1,22 @@
+name: Codex CLI SSH
+slug: codex_cli
+description: Persistent Codex CLI workspace accessible by SSH
+version: 0.1.1
+url: https://github.com/manix84/ha-codex-cli-addon
+arch:
+  - amd64
+  - aarch64
+startup: application
+boot: auto
+init: false
+ports:
+  22/tcp: 22223
+ports_description:
+  22/tcp: Codex SSH access
+map:
+  - type: addon_config
+    read_only: true
+  - type: homeassistant_config
+    read_only: false
+  - type: addons
+    read_only: false

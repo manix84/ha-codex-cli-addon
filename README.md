@@ -2,6 +2,8 @@
 
 A Home Assistant add-on that runs [OpenAI Codex CLI](https://learn.chatgpt.com/docs/codex/cli) in a dedicated SSH container. It keeps the SSH host key and Codex user's home directory in persistent add-on storage, so login state survives add-on updates.
 
+Maintained by **Rob Taylor**.
+
 ## Install
 
 1. In Home Assistant, open **Settings → Add-ons → Add-on Store → Repositories** and add `https://github.com/manix84/ha-codex-cli-addon`.
@@ -14,6 +16,13 @@ A Home Assistant add-on that runs [OpenAI Codex CLI](https://learn.chatgpt.com/d
 For the Codex desktop app, add an SSH connection using the `codex` user, your Home Assistant address, and port `22223`. The writable Home Assistant configuration and local add-on folders appear at `/homeassistant` and `/addons`.
 
 See [add-on documentation](codex_cli/DOCS.md) for security, update, and backup notes.
+
+## Community
+
+- [Contributing](CONTRIBUTING.md)
+- [Code of conduct](CODE_OF_CONDUCT.md)
+- [Security policy](SECURITY.md)
+- [Support](SUPPORT.md)
 
 ## Development
 

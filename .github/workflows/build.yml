@@ -4,12 +4,19 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [linux/amd64, linux/arm64]
+        include:
+          - platform: linux/amd64
+            arch: amd64
+          - platform: linux/arm64
+            arch: aarch64
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -18,4 +25,58 @@ jobs:
         with:
           context: ./codex_cli
           platforms: ${{ matrix.platform }}
+          build-args: BUILD_ARCH=${{ matrix.arch }}
+          tags: codex-cli-addon:test
+          load: true
           push: false
+      - name: Smoke test SSH and persistent data
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh-keygen -q -t ed25519 -N '' -f test_key
+          mkdir -p test-config test-data
+          cp test_key.pub test-config/authorized_keys
+          mkdir -p test-homeassistant test-addons
+          sudo chown root:root test-homeassistant test-addons
+          sudo chmod 0755 test-homeassistant test-addons
+          docker run -d --name codex-test \
+            -p 127.0.0.1:22223:22 \
+            -v "$PWD/test-config:/config:ro" \
+            -v "$PWD/test-data:/data" \
+            -v "$PWD/test-homeassistant:/homeassistant" \
+            -v "$PWD/test-addons:/addons" \
+            codex-cli-addon:test
+          cleanup() {
+            status=$?
+            if test "$status" -ne 0; then
+              docker ps -a --filter name=codex-test || true
+              docker logs codex-test || true
+            fi
+            docker rm -f codex-test >/dev/null 2>&1 || true
+            exit "$status"
+          }
+          trap cleanup EXIT
+          for attempt in $(seq 1 30); do
+            if ssh-keyscan -T 2 -p 22223 127.0.0.1 2>/dev/null > known_hosts && test -s known_hosts; then
+              break
+            fi
+            sleep 1
+          done
+          test -s known_hosts
+          ssh -i test_key -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o UserKnownHostsFile="$PWD/known_hosts" -p 22223 codex@127.0.0.1 \
+            'codex --version && test "$(id -u)" = 0 && printf persisted > ~/.codex/smoke-marker && printf config > /homeassistant/smoke-marker && printf addon > /addons/smoke-marker'
+          test "$(cat test-homeassistant/smoke-marker)" = config
+          test "$(cat test-addons/smoke-marker)" = addon
+          docker restart codex-test
+          for attempt in $(seq 1 30); do
+            if ssh-keyscan -T 2 -p 22223 127.0.0.1 2>/dev/null > known_hosts_after && test -s known_hosts_after; then
+              break
+            fi
+            sleep 1
+          done
+          test -s known_hosts_after
+          cmp known_hosts known_hosts_after
+          ssh -i test_key -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o UserKnownHostsFile="$PWD/known_hosts" -p 22223 codex@127.0.0.1 \
+            'test "$(cat ~/.codex/smoke-marker)" = persisted'

@@ -1,7 +1,7 @@
 name: Codex CLI SSH
 slug: codex_cli
 description: Persistent Codex CLI workspace accessible by SSH
-version: 0.1.1
+version: 0.1.2
 url: https://github.com/manix84/ha-codex-cli-addon
 arch:
   - amd64

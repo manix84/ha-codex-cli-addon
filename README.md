@@ -13,7 +13,7 @@ Maintained by **Rob Taylor**.
 5. Run `ssh -p 22223 codex@<home-assistant-address> 'codex --version'`.
 6. Run `ssh -t -p 22223 codex@<home-assistant-address> 'codex login --device-auth'`, finish login in your browser, then verify with `ssh -p 22223 codex@<home-assistant-address> 'codex login status'`.
 
-For the Codex desktop app, add an SSH connection using the `codex` user, your Home Assistant address, and port `22223`. The writable Home Assistant configuration and local add-on folders appear at `/homeassistant` and `/addons`.
+For the Codex desktop app, add an SSH connection using the `codex` user, your Home Assistant address, and port `22223`. The writable Home Assistant configuration and local add-on folders appear at `/homeassistant` and `/addons`. **The `codex` SSH account has root permissions inside this container** to write those root-owned mounts. It can read Home Assistant secrets in `/homeassistant`; give its SSH key only to trusted administrators and keep the port on a trusted network.
 
 See [add-on documentation](codex_cli/DOCS.md) for security, update, and backup notes.
 

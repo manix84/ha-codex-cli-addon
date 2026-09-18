@@ -46,7 +46,16 @@ jobs:
             -v "$PWD/test-homeassistant:/homeassistant" \
             -v "$PWD/test-addons:/addons" \
             codex-cli-addon:test
-          trap 'docker rm -f codex-test >/dev/null 2>&1 || true' EXIT
+          cleanup() {
+            status=$?
+            if test "$status" -ne 0; then
+              docker ps -a --filter name=codex-test || true
+              docker logs codex-test || true
+            fi
+            docker rm -f codex-test >/dev/null 2>&1 || true
+            exit "$status"
+          }
+          trap cleanup EXIT
           for attempt in $(seq 1 30); do
             if ssh-keyscan -T 2 -p 22223 127.0.0.1 2>/dev/null > known_hosts && test -s known_hosts; then
               break
